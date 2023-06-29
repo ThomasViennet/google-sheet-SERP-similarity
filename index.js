@@ -27,13 +27,18 @@ function getCommonURLs(urls1, urls2) {
 
 function calculateSimilarityScore(urls1, urls2, commonURLs) {
     let score = 0;
+
     for (const url of commonURLs) {
-        const weight1 = urls1.length - urls1.indexOf(url);
-        const weight2 = urls2.length - urls2.indexOf(url);
+        //The earlier a URL appears in a SERP, the more weight it has in the similarity calculation.
+        const weight1 = urls1.indexOf(url) + 1;
+        const weight2 = urls2.indexOf(url) + 1;
+
         score += weight1 * weight2;
     }
-    return score;
+
+    return score; // Return the total similarity score
 }
+
 
 function updateSimilarities(queriesData, queriesDataClone) {
     for (const queryData of queriesData) {
@@ -64,8 +69,8 @@ const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 // console.log(JSON.stringify(updatedQueriesData, null, 2));
 
 module.exports = {
-  createQueriesData,
-  getCommonURLs,
-  calculateSimilarityScore,
-  updateSimilarities,
+    createQueriesData,
+    getCommonURLs,
+    calculateSimilarityScore,
+    updateSimilarities,
 };
