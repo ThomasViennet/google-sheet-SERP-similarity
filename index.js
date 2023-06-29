@@ -9,6 +9,18 @@ if (process.env.NODE_ENV === 'test') {
     dataSelected = fixtures.dataSelected;
 } else {
     // Otherwise, fetch the data using Google Sheet functions
+    function onOpen(e) {
+        SpreadsheetApp.getUi()
+            .createMenu('SEO')
+            .addItem('Calculer la similarité', 'serpSimilarity')
+            .addToUi();
+    }
+    
+    function serpSimilarity() {
+        const sheet = SpreadsheetApp.getActiveSpreadsheet();
+        dataSelected = sheet.getSelection().getActiveRange().getValues();
+        //output.getRange(1, 1, response.length, 1).setValues(response.map(node => [node.join('')]));
+    }
 }
 
 function createQueriesData(serp) {
