@@ -1,34 +1,51 @@
-const { generateQueriesData, searchSerp, updateSerp, updateQueriesData } = require('./index');
-const { serp, dataSelected } = require('./fixtures');
+const { serp, dataSelected } = require('./fixtures.js');
+const { createQueriesData, getCommonURLs, calculateSimilarityScore, updateSimilarities } = require('./index.js');
 
-describe('Test functions from index.js', () => {
-    test('generateQueriesData generates correct data structure', () => {
-        const result = generateQueriesData(dataSelected);
-        expect(result).toEqual([
-            { Query: 'A', URL: [], Similarities: [] },
-            { Query: 'B', URL: [], Similarities: [] },
-            { Query: 'C', URL: [], Similarities: [] }
-        ]);
-    });
-
-    test('searchSerp finds correct URL data for a query', () => {
-        const result = searchSerp('A', serp);
-        expect(result).toEqual(['1', '1', '1', '1', '1', '1', '1', '1', '1', '1']);
-    });
-
-    test('updateSerp updates URL data for a query', () => {
-        const data = generateQueriesData(dataSelected);
-        const result = updateSerp(data, 'A', ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1']);
-        expect(result[0].URL).toEqual(['1', '1', '1', '1', '1', '1', '1', '1', '1', '1']);
-    });
-
-    test('updateQueriesData updates URL data for all queries', () => {
-        let queriesData = generateQueriesData(dataSelected);
-        queriesData = updateQueriesData(queriesData, serp, searchSerp, updateSerp);
-        expect(queriesData).toEqual([
-            { Query: 'A', URL: ['1', '1', '1', '1', '1', '1', '1', '1', '1', '1'], Similarities: [] },
-            { Query: 'B', URL: ['2', '2', '2', '2', '2', '2', '2', '2', '2', '2'], Similarities: [] },
-            { Query: 'C', URL: ['3', '3', '3', '3', '3', '3', '3', '3', '3', '3'], Similarities: [] }
-        ]);
-    });
+test('createQueriesData creates correct data structure', () => {
+    const queriesData = createQueriesData(serp);
+    expect(queriesData).toEqual(expect.arrayContaining([
+        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
+        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
+        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
+        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] }
+    ]));
 });
+
+test('getCommonURLs returns correct URLs', () => {
+    const urls1 = ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'];
+    const urls2 = ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'];
+    const commonURLs = getCommonURLs(urls1, urls2);
+    expect(commonURLs).toEqual(expect.arrayContaining(['url_A1', 'url_A2']));
+});
+
+test('calculateSimilarityScore returns correct score', () => {
+    const urls1 = ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'];
+    const urls2 = ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'];
+    const commonURLs = ['url_A1', 'url_A2'];
+    const score = calculateSimilarityScore(urls1, urls2, commonURLs);
+    expect(score).toBe(22); // calculated based on the formula
+});
+
+test('updateSimilarities updates the Similarities array correctly', () => {
+    const queriesData = [
+        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
+        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
+        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
+        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] }
+    ];
+    const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
+    const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
+    expect(updatedQueriesData[0].Similarities).toEqual(expect.arrayContaining([
+        { Query: 'B', URLs: ['url_A1', 'url_A2'], SimilarityScore: 22 }
+    ]));
+    // Similar checks for other queries
+    expect(updatedQueriesData[2].Similarities).toEqual(expect.arrayContaining([
+        { Query: 'A', URLs: ['url_A1', 'url_A2'], SimilarityScore: 22 },
+        { Query: 'D', URLs: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], SimilarityScore: 48 }
+    ]));
+    expect(updatedQueriesData[3].Similarities).toEqual(expect.arrayContaining([
+        { Query: 'A', URLs: ['url_A1', 'url_A2'], SimilarityScore: 22 },
+        { Query: 'C', URLs: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], SimilarityScore: 48 }
+    ]));
+});
+

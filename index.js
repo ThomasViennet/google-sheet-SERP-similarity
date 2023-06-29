@@ -1,24 +1,3 @@
-/** 
- * Script process:
- * 1. Create an array of objects
- * [{'Query':..., 'URL':[...]},...]
- * 
- * 2. Add similar queries to the objects
- * [
- *     {
- *         'Query': '...',
- *         'URL': ['...'],
- *         'Similarities':
- *             [
- *                 {
- *                     'Query': '...',
- *                     'Score': '...'
- *                 }
- *             ]
- *     }
- * ];
-**/
-
 require('dotenv').config();
 
 let serp, dataSelected;
@@ -32,45 +11,61 @@ if (process.env.NODE_ENV === 'test') {
     // Otherwise, fetch the data using Google Sheet functions
 }
 
-// Function to generate the initial array of query data
-function generateQueriesData(dataSelected) {
-    return dataSelected.map(query => ({
-        'Query': query[0],
-        'URL': [],
-        'Similarities': []
-    }));
-}
-
-// Function to search for the URLs corresponding to a query in the SERP data
-function searchSerp(query, serp) {
-    return serp
-        .filter(ser => ser[0] === query)
-        .map(ser => ser[1]);
-}
-
-// Function to update the URLs of a query in the array of query data
-function updateSerp(data, query, newURL) {
-    const objectToUpdate = data.find(item => item.Query === query);
-    if (objectToUpdate) {
-        objectToUpdate.URL = newURL;
-    }
-    return data;
-}
-
-// Function to update the URLs of all queries in the array of query data
-function updateQueriesData(queriesData, serp, searchSerp, updateSerp) {
-    for (const queryData of queriesData) {
-        updateSerp(queriesData, queryData.Query, searchSerp(queryData.Query, serp));    
+function createQueriesData(serp) {
+    const queriesData = [];
+    for (const data of dataSelected) {
+        const URLs = serp.filter(el => el[0] === data[0]).map(el => el[1]);
+        queriesData.push({ 'Query': data[0], 'URL': URLs, 'Similarities': [] });
     }
     return queriesData;
 }
 
-// Generate the initial array of query data
-let queriesData = generateQueriesData(dataSelected);
-// Update the URLs of all queries in the array of query data
-queriesData = updateQueriesData(queriesData, serp, searchSerp, updateSerp);
+function getCommonURLs(urls1, urls2) {
+    const commonURLs = urls1.filter(url => urls2.includes(url));
+    return commonURLs;
+}
 
-// Display the final data
-console.log(queriesData);
+function calculateSimilarityScore(urls1, urls2, commonURLs) {
+    let score = 0;
+    for (const url of commonURLs) {
+        const weight1 = urls1.length - urls1.indexOf(url);
+        const weight2 = urls2.length - urls2.indexOf(url);
+        score += weight1 * weight2;
+    }
+    return score;
+}
 
-module.exports = { generateQueriesData, searchSerp, updateSerp, updateQueriesData };
+function updateSimilarities(queriesData, queriesDataClone) {
+    for (const queryData of queriesData) {
+        for (const queryDataClone of queriesDataClone) {
+            if (queryData.Query !== queryDataClone.Query) {
+                const commonURLs = getCommonURLs(queryData.URL, queryDataClone.URL);
+                if (commonURLs.length > 0) {
+                    const similarityScore = calculateSimilarityScore(queryData.URL, queryDataClone.URL, commonURLs);
+                    queryData.Similarities.push({
+                        'Query': queryDataClone.Query,
+                        'URLs': commonURLs,
+                        'SimilarityScore': similarityScore
+                    });
+                }
+            }
+        }
+    }
+    return queriesData;
+}
+
+// Create a clone of queries data for comparison
+const queriesData = createQueriesData(serp);
+const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
+
+// Update the Similarities for each query in the queries data array
+const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
+
+// console.log(JSON.stringify(updatedQueriesData, null, 2));
+
+module.exports = {
+  createQueriesData,
+  getCommonURLs,
+  calculateSimilarityScore,
+  updateSimilarities,
+};
