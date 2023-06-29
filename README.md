@@ -15,7 +15,6 @@ You need [Node.js](https://nodejs.org/en/download/) installed on your machine.
     ```
     npm install
     ```
-
 ## Usage
 
 The current state of the script does not allow for Google Sheets interaction yet. This feature is under development.
@@ -24,10 +23,7 @@ The current state of the script does not allow for Google Sheets interaction yet
 
 Run the tests with:
 
-    ```
     npm test
-    ```
-
 ## Contributing
 
 Contributions, issues, and feature requests are welcome!
