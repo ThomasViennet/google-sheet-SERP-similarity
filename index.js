@@ -27,18 +27,36 @@ function getCommonURLs(urls1, urls2) {
 
 function calculateSimilarityScore(urls1, urls2, commonURLs) {
     let score = 0;
-
     for (const url of commonURLs) {
         //The earlier a URL appears in a SERP, the more weight it has in the similarity calculation.
-        const weight1 = urls1.indexOf(url) + 1;
-        const weight2 = urls2.indexOf(url) + 1;
+        const weight1 = urls1.length - urls1.indexOf(url);
+        const weight2 = urls2.length - urls2.indexOf(url);
+        score += weight1 * weight2;
+    }
+    return score;
+}
 
+function calculateMaxSimilarityScore(urls1) {
+    let score = 0;
+    for (const url of urls1) {
+        //The earlier a URL appears in a SERP, the more weight it has in the similarity calculation.
+        const weight1 = urls1.length - urls1.indexOf(url);
+        const weight2 = urls1.length - urls1.indexOf(url);
         score += weight1 * weight2;
     }
 
-    return score; // Return the total similarity score
+    return score;
 }
 
+function calculateSimilarityPercentage(urls1, urls2, commonURLs) {
+    
+    const totalPossibleScore = calculateMaxSimilarityScore(urls1);
+    console.log(totalPossibleScore);
+    const score = calculateSimilarityScore(urls1, urls2, commonURLs);
+    console.log(score);
+    const similarityPercentage = (score / totalPossibleScore) * 100;
+    return similarityPercentage;
+}
 
 function updateSimilarities(queriesData, queriesDataClone) {
     for (const queryData of queriesData) {
@@ -72,5 +90,7 @@ module.exports = {
     createQueriesData,
     getCommonURLs,
     calculateSimilarityScore,
+    calculateMaxSimilarityScore,
+    calculateSimilarityPercentage,
     updateSimilarities,
 };
