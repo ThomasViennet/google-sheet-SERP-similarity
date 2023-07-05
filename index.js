@@ -64,8 +64,8 @@ const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 // console.log(JSON.stringify(updatedQueriesData, null, 2));
 
 module.exports = {
-  createQueriesData,
-  getCommonURLs,
-  calculateSimilarityScore,
-  updateSimilarities,
+    createQueriesData,
+    getCommonURLs,
+    calculateSimilarityScore,
+    updateSimilarities,
 };
