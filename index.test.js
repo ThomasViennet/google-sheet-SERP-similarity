@@ -1,5 +1,5 @@
 const { serp, dataSelected } = require('./fixtures.js');
-const { createQueriesData, getCommonURLs, calculateSimilarityScore, calculateMaxSimilarityScore, calculateSimilarityPercentage, updateSimilarities } = require('./index.js');
+const { createQueriesData, getCommonURLs, calculateSimilarityScore, calculateMaxSimilarityScore, calculateSimilarityPercentage, updateSimilarities, getSimilarQueries } = require('./index.js');
 
 test('createQueriesData creates correct data structure', () => {
     const queriesData = createQueriesData(serp);
@@ -7,7 +7,8 @@ test('createQueriesData creates correct data structure', () => {
         { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
         { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
         { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
-        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] }
+        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
+        { Query: 'E', URL: ['url_E1', 'url_E2', 'url_E3', 'url_E4', 'url_E5'], Similarities: [] }
     ]));
 });
 
@@ -134,4 +135,20 @@ test('updateSimilarities updates the Similarities array correctly', () => {
         { Query: 'B', URLs: ['url_A4', 'url_A5'], SimilarityScore: 5, SimilarityPercentage: 9 }
     ]));
 
+});
+
+test('getSimilarQueries returns correct data', () => {
+    const queriesData = [
+        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
+        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
+        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
+    ];
+    const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
+    const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
+    const similarQueriesArray = getSimilarQueries(updatedQueriesData);
+    expect(similarQueriesArray).toEqual(expect.arrayContaining([
+        ["C (72%), B (23%)"],
+        ["C (25%), A (23%)"],
+        ["A (72%), B (25%)"]
+    ]));
 });

@@ -1,5 +1,6 @@
 const serp =
     [
+        ['', ''],
         ['A', 'url_A1'],
         ['A', 'url_A2'],
         ['A', 'url_A3'],
@@ -20,8 +21,15 @@ const serp =
         ['D', 'url_C3'],
         ['D', 'url_C4'],
         ['D', 'url_C5'],
+        ['E', 'url_E1'],
+        ['E', 'url_E2'],
+        ['E', 'url_E3'],
+        ['E', 'url_E4'],
+        ['E', 'url_E5'],
+        ['', ''],
+        ['', '']
     ];
 
-const dataSelected = [['A'], ['B'], ['C'], ['D']];
+const dataSelected = [['AB'], ['AC'], ['A'], ['B'], ['BA'], ['C'], ['D'], ['E']];
 
 module.exports = { serp, dataSelected };
