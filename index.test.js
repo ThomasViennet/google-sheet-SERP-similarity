@@ -137,18 +137,22 @@ test('updateSimilarities updates the Similarities array correctly', () => {
 
 });
 
-test('getSimilarQueries returns correct data', () => {
-    const queriesData = [
-        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
-        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
-        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
+
+test('getSimilarQueries returns correct queries', () => {
+    const updatedQueriesData = [
+        {
+            Query: 'A', URL: ['url_A1', 'url_A2'], Similarities: [
+                { Query: 'B', URLs: ['url_A1'], SimilarityScore: 5, SimilarityPercentage: 20 },
+                { Query: 'C', URLs: ['url_A1', 'url_A2'], SimilarityScore: 10, SimilarityPercentage: 50 },
+            ]
+        },
+        { Query: 'B', URL: ['url_B1', 'url_B2'], Similarities: [] },
     ];
-    const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
-    const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
-    const similarQueriesArray = getSimilarQueries(updatedQueriesData);
-    expect(similarQueriesArray).toEqual(expect.arrayContaining([
-        ["C (72%), B (23%)"],
-        ["C (25%), A (23%)"],
-        ["A (72%), B (25%)"]
+
+    const similarQueries = getSimilarQueries(updatedQueriesData);
+
+    expect(similarQueries).toEqual(expect.arrayContaining([
+        ["C (50%), B (20%)"],
+        [""]
     ]));
 });

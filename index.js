@@ -104,6 +104,7 @@ const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
 const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 const similarQueriesArray = getSimilarQueries(updatedQueriesData);
 
+//console.log(JSON.stringify(updatedQueriesData, null, 2));
 
 module.exports = {
     createQueriesData,
