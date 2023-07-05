@@ -51,11 +51,9 @@ function calculateMaxSimilarityScore(urls1) {
 function calculateSimilarityPercentage(urls1, urls2, commonURLs) {
     
     const totalPossibleScore = calculateMaxSimilarityScore(urls1);
-    console.log(totalPossibleScore);
     const score = calculateSimilarityScore(urls1, urls2, commonURLs);
-    console.log(score);
     const similarityPercentage = (score / totalPossibleScore) * 100;
-    return similarityPercentage;
+    return Math.trunc(similarityPercentage);
 }
 
 function updateSimilarities(queriesData, queriesDataClone) {
@@ -65,10 +63,12 @@ function updateSimilarities(queriesData, queriesDataClone) {
                 const commonURLs = getCommonURLs(queryData.URL, queryDataClone.URL);
                 if (commonURLs.length > 0) {
                     const similarityScore = calculateSimilarityScore(queryData.URL, queryDataClone.URL, commonURLs);
+                    const similarityPercentage = calculateSimilarityPercentage(queryData.URL, queryDataClone.URL, commonURLs);
                     queryData.Similarities.push({
                         'Query': queryDataClone.Query,
                         'URLs': commonURLs,
-                        'SimilarityScore': similarityScore
+                        'SimilarityScore': similarityScore,
+                        'SimilarityPercentage': similarityPercentage
                     });
                 }
             }
@@ -77,6 +77,7 @@ function updateSimilarities(queriesData, queriesDataClone) {
     return queriesData;
 }
 
+
 // Create a clone of queries data for comparison
 const queriesData = createQueriesData(serp);
 const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
@@ -84,7 +85,7 @@ const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
 // Update the Similarities for each query in the queries data array
 const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 
-// console.log(JSON.stringify(updatedQueriesData, null, 2));
+console.log(JSON.stringify(updatedQueriesData, null, 2));
 
 module.exports = {
     createQueriesData,
