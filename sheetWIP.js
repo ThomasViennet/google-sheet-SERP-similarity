@@ -12,11 +12,11 @@ function calculateSimilarity() {
     const serpSheet = spreadsheet.getSheetByName("SERP");
 
     let serp = serpSheet.getRange("A2:B" + serpSheet.getLastRow()).getValues();
-    let dataSelected = getColumnData("Requête");
+    let queries = getColumnData("Requête");
     let targetUrl = getColumnData("URL cible");
-    var statusData = getColumnData("État");
+    var status = getColumnData("État");
 
-    const queriesData = createQueriesData(serp, dataSelected, targetUrl);
+    const queriesData = createQueriesData(serp, queries, targetUrl);
     const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
     const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
     const similarQueriesArray = getSimilarQueries(updatedQueriesData);
@@ -71,11 +71,11 @@ function updateColumnData(columnName, updatedData) {
 
 // END for Google Sheet
 
-function createQueriesData(serp, dataSelected, targetUrl) {
+function createQueriesData(serp, queries, targetUrl) {
     const queriesData = [];
-    for (let i = 0; i < dataSelected.length; i++) {
-        const URLs = serp.filter(el => el[0] === dataSelected[i][0]).map(el => el[1]);
-        queriesData.push({ 'Query': dataSelected[i][0], 'URL': URLs, 'Similarities': [], 'TargetUrl': targetUrl[i][0] });
+    for (let i = 0; i < queries.length; i++) {
+        const URLs = serp.filter(el => el[0] === queries[i][0]).map(el => el[1]);
+        queriesData.push({ 'Query': queries[i][0], 'URL': URLs, 'Similarities': [], 'TargetUrl': targetUrl[i][0] });
     }
     return queriesData;
 }

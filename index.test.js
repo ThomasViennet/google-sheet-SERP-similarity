@@ -1,14 +1,14 @@
-const { serp, dataSelected, targetUrl } = require('./fixtures.js');
+const { serp, queries, targetUrl, status } = require('./fixtures.js');
 const { createQueriesData, getCommonURLs, calculateSimilarityScore, calculateMaxSimilarityScore, calculateSimilarityPercentage, updateSimilarities, getSimilarQueries } = require('./index.js');
 
 test('createQueriesData creates correct data structure', () => {
-    const queriesData = createQueriesData(serp, dataSelected, targetUrl);
+    const queriesData = createQueriesData(serp, queries, targetUrl, status);
     expect(queriesData).toEqual(expect.arrayContaining([
-        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], TargetUrl: 'target_A', Similarities: [] },
-        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], TargetUrl: 'target_B', Similarities: [] },
-        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], TargetUrl: 'target_C', Similarities: [] },
-        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], TargetUrl: 'target_D', Similarities: [] }
-    ]));
+        { "Query": "A", "Similarities": [], "Status": "Validé", "TargetUrl": "target_A", "URL": ["url_A1", "url_A2", "url_A3", "url_A4", "url_A5"] },
+        { "Query": "B", "Similarities": [], "Status": "Abandonné", "TargetUrl": "target_B", "URL": ["url_B1", "url_B2", "url_B3", "url_A2", "url_A1"] },
+        { "Query": "C", "Similarities": [], "Status": "État", "TargetUrl": "target_C", "URL": ["url_A2", "url_A1", "url_C3", "url_C4", "url_C5"] },
+        { "Query": "D", "Similarities": [], "Status": "À valider", "TargetUrl": "target_D", "URL": ["url_A1", "url_A2", "url_C3", "url_C4", "url_C5"] }
+]));
 });
 
 test('getCommonURLs returns correct URLs', () => {
@@ -139,8 +139,8 @@ test('updateSimilarities updates the Similarities array correctly', () => {
 test('getSimilarQueries returns correct result for non-empty similarities', () => {
     const updatedQueriesData = [
         {
-            Query: 'A', 
-            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], 
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
             TargetUrl: 'target_A',
             Similarities: [
                 {
@@ -148,6 +148,7 @@ test('getSimilarQueries returns correct result for non-empty similarities', () =
                     'URLs': ['url_A1', 'url_B2'],
                     'SimilarityScore': 10,
                     'SimilarityPercentage': 70,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_B'
                 },
                 {
@@ -155,6 +156,7 @@ test('getSimilarQueries returns correct result for non-empty similarities', () =
                     'URLs': ['url_A2'],
                     'SimilarityScore': 5,
                     'SimilarityPercentage': 50,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_C'
                 }
             ]
@@ -167,8 +169,8 @@ test('getSimilarQueries returns correct result for non-empty similarities', () =
 test('getSimilarQueries returns empty string for empty similarities', () => {
     const updatedQueriesData = [
         {
-            Query: 'A', 
-            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], 
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
             TargetUrl: 'target_A',
             Similarities: []
         }
@@ -180,8 +182,8 @@ test('getSimilarQueries returns empty string for empty similarities', () => {
 test('getSimilarQueries filters out queries with the same TargetUrl', () => {
     const updatedQueriesData = [
         {
-            Query: 'A', 
-            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], 
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
             TargetUrl: 'target_A',
             Similarities: [
                 {
@@ -189,6 +191,7 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
                     'URLs': ['url_A1', 'url_B2'],
                     'SimilarityScore': 10,
                     'SimilarityPercentage': 70,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_B'
                 },
                 {
@@ -196,6 +199,7 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
                     'URLs': ['url_A2'],
                     'SimilarityScore': 5,
                     'SimilarityPercentage': 50,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_A'
                 }
             ]
@@ -208,8 +212,8 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
 test('getSimilarQueries filters out queries with the same TargetUrl', () => {
     const updatedQueriesData = [
         {
-            Query: 'A', 
-            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], 
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
             TargetUrl: 'target_A',
             Similarities: [
                 {
@@ -236,8 +240,8 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
 test('getSimilarQueries filters out queries with the same TargetUrl', () => {
     const updatedQueriesData = [
         {
-            Query: 'A', 
-            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], 
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
             TargetUrl: 'target_A',
             Similarities: [
                 {
@@ -245,6 +249,7 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
                     'URLs': ['url_A1', 'url_B2'],
                     'SimilarityScore': 10,
                     'SimilarityPercentage': 70,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_A'
                 },
                 {
@@ -252,6 +257,7 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
                     'URLs': ['url_A2'],
                     'SimilarityScore': 5,
                     'SimilarityPercentage': 50,
+                    'Status': 'Validé',
                     'TargetUrl': 'target_C'
                 }
             ]
@@ -259,4 +265,34 @@ test('getSimilarQueries filters out queries with the same TargetUrl', () => {
     ];
     const result = getSimilarQueries(updatedQueriesData);
     expect(result).toEqual(expect.arrayContaining([["C (50%)"]]));
+});
+
+test('getSimilarQueries filters out queries with the same TargetUrl', () => {
+    const updatedQueriesData = [
+        {
+            Query: 'A',
+            URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'],
+            TargetUrl: 'target_A',
+            Similarities: [
+                {
+                    'Query': 'B',
+                    'URLs': ['url_A1', 'url_B2'],
+                    'SimilarityScore': 10,
+                    'SimilarityPercentage': 70,
+                    'Status': 'Validé',
+                    'TargetUrl': 'target_A'
+                },
+                {
+                    'Query': 'C',
+                    'URLs': ['url_A2'],
+                    'SimilarityScore': 5,
+                    'SimilarityPercentage': 50,
+                    'Status': 'À valider',
+                    'TargetUrl': 'target_C'
+                }
+            ]
+        }
+    ];
+    const result = getSimilarQueries(updatedQueriesData);
+    expect(result).toEqual(expect.arrayContaining([[""]]));
 });

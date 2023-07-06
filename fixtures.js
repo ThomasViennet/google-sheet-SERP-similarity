@@ -22,7 +22,8 @@ const serp =
         ['D', 'url_C5'],
     ];
 
-const dataSelected = [['A'], ['B'], ['C'], ['D']];
+const queries = [['A'], ['B'], ['C'], ['D']];
 const targetUrl = [['target_A'], ['target_B'], ['target_C'], ['target_D']];
+const status = [['Validé'], ['Abandonné'], ['État'], ['À valider']];
 
-module.exports = { serp, dataSelected, targetUrl };
+module.exports = { serp, queries, targetUrl, status };

@@ -1,23 +1,24 @@
 require('dotenv').config();
 
-let serp, dataSelected, targetUrl;
+let serp, queries, targetUrl, status;
 
 // If it's the test environment, use test data
 if (process.env.NODE_ENV === 'test') {
     const fixtures = require('./fixtures.js');
-    serp = fixtures.serp;
-    dataSelected = fixtures.dataSelected;
-    targetUrl = fixtures.targetUrl;
 
+    serp = fixtures.serp;
+    queries = fixtures.queries;
+    targetUrl = fixtures.targetUrl;
+    status = fixtures.status;
 } else {
     // Otherwise, fetch the data using Google Sheet functions
 }
 
-function createQueriesData(serp, dataSelected, targetUrl) {
+function createQueriesData(serp, queries, targetUrl, status) {
     const queriesData = [];
-    for (let i = 0; i < dataSelected.length; i++) {
-        const URLs = serp.filter(el => el[0] === dataSelected[i][0]).map(el => el[1]);
-        queriesData.push({ 'Query': dataSelected[i][0], 'URL': URLs, 'Similarities': [], 'TargetUrl': targetUrl[i][0] });
+    for (let i = 0; i < queries.length; i++) {
+        const URLs = serp.filter(el => el[0] === queries[i][0]).map(el => el[1]);
+        queriesData.push({ 'Query': queries[i][0], 'URL': URLs, 'Similarities': [], 'TargetUrl': targetUrl[i][0], 'Status': status[i][0] });
     }
     return queriesData;
 }
@@ -67,7 +68,8 @@ function updateSimilarities(queriesData, queriesDataClone) {
                         'URLs': commonURLs,
                         'SimilarityScore': similarityScore,
                         'SimilarityPercentage': similarityPercentage,
-                        'TargetUrl': queryDataClone.TargetUrl
+                        'TargetUrl': queryDataClone.TargetUrl,
+                        'Status': queryDataClone.Status
                     });
                 }
             }
@@ -76,10 +78,11 @@ function updateSimilarities(queriesData, queriesDataClone) {
     return queriesData;
 }
 
+
 function getSimilarQueries(updatedQueriesData) {
     return updatedQueriesData.map(queryData => {
         const nonZeroSimilarsWithDifferentTargetUrl = queryData.Similarities
-            .filter(similarity => similarity.SimilarityPercentage !== 0 && similarity.TargetUrl !== queryData.TargetUrl)
+            .filter(similarity => similarity.SimilarityPercentage !== 0 && similarity.TargetUrl !== queryData.TargetUrl && similarity.Status === "Validé")
             .sort((a, b) => b.SimilarityPercentage - a.SimilarityPercentage);
 
         if (nonZeroSimilarsWithDifferentTargetUrl.length === 0) {
@@ -91,8 +94,7 @@ function getSimilarQueries(updatedQueriesData) {
     });
 }
 
-
-const queriesData = createQueriesData(serp, dataSelected, targetUrl);
+const queriesData = createQueriesData(serp, queries, targetUrl, status);
 const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
 const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 const similarQueriesArray = getSimilarQueries(updatedQueriesData);
