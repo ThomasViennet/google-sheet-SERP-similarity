@@ -23,5 +23,6 @@ const serp =
     ];
 
 const dataSelected = [['A'], ['B'], ['C'], ['D']];
+const targetUrl = [['targer_A'], ['target_A'], ['target_C'], ['target_D']];
 
 module.exports = { serp, dataSelected };
