@@ -1,13 +1,13 @@
-const { serp, dataSelected } = require('./fixtures.js');
+const { serp, dataSelected, targetUrl } = require('./fixtures.js');
 const { createQueriesData, getCommonURLs, calculateSimilarityScore, calculateMaxSimilarityScore, calculateSimilarityPercentage, updateSimilarities, getSimilarQueries } = require('./index.js');
 
 test('createQueriesData creates correct data structure', () => {
-    const queriesData = createQueriesData(serp);
+    const queriesData = createQueriesData(serp, dataSelected, targetUrl);
     expect(queriesData).toEqual(expect.arrayContaining([
-        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], Similarities: [] },
-        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], Similarities: [] },
-        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] },
-        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], Similarities: [] }
+        { Query: 'A', URL: ['url_A1', 'url_A2', 'url_A3', 'url_A4', 'url_A5'], TargetUrl: 'target_A', Similarities: [] },
+        { Query: 'B', URL: ['url_B1', 'url_B2', 'url_B3', 'url_A2', 'url_A1'], TargetUrl: 'target_B', Similarities: [] },
+        { Query: 'C', URL: ['url_A2', 'url_A1', 'url_C3', 'url_C4', 'url_C5'], TargetUrl: 'target_C', Similarities: [] },
+        { Query: 'D', URL: ['url_A1', 'url_A2', 'url_C3', 'url_C4', 'url_C5'], TargetUrl: 'target_D', Similarities: [] }
     ]));
 });
 

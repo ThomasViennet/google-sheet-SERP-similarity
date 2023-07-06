@@ -1,21 +1,23 @@
 require('dotenv').config();
 
-let serp, dataSelected;
+let serp, dataSelected, targetUrl;
 
 // If it's the test environment, use test data
 if (process.env.NODE_ENV === 'test') {
     const fixtures = require('./fixtures.js');
     serp = fixtures.serp;
     dataSelected = fixtures.dataSelected;
+    targetUrl = fixtures.targetUrl;
+    
 } else {
     // Otherwise, fetch the data using Google Sheet functions
 }
 
-function createQueriesData(serp) {
+function createQueriesData(serp, dataSelected, targetUrl) {
     const queriesData = [];
-    for (const data of dataSelected) {
-        const URLs = serp.filter(el => el[0] === data[0]).map(el => el[1]);
-        queriesData.push({ 'Query': data[0], 'URL': URLs, 'Similarities': [] });
+    for (let i = 0; i < dataSelected.length; i++) {
+        const URLs = serp.filter(el => el[0] === dataSelected[i][0]).map(el => el[1]);
+        queriesData.push({ 'Query': dataSelected[i][0], 'URL': URLs, 'TargetUrl': targetUrl[i][0], 'Similarities': [] });
     }
     return queriesData;
 }
@@ -101,7 +103,7 @@ function getSimilarQueries(updatedQueriesData) {
     return result;
 }
 
-const queriesData = createQueriesData(serp);
+const queriesData = createQueriesData(serp, dataSelected, targetUrl);
 const queriesDataClone = JSON.parse(JSON.stringify(queriesData));
 const updatedQueriesData = updateSimilarities(queriesData, queriesDataClone);
 const similarQueriesArray = getSimilarQueries(updatedQueriesData);
